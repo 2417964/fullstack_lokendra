@@ -11,4 +11,17 @@ function updateBook($mysqli, $id, $title, $author, $genre, $year, $isbn) {
     return $stmt->execute();
 }
 
+function deleteBook($mysqli, $id) {
+    $stmt = $mysqli->prepare("DELETE FROM scifi_books WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+function getBookById($mysqli, $id) {
+    $stmt = $mysqli->prepare("SELECT * FROM scifi_books WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
 ?>
