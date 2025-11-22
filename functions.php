@@ -24,4 +24,42 @@ function getBookById($mysqli, $id) {
     return $stmt->get_result()->fetch_assoc();
 }
 
+function searchBooks($mysqli, $searchTerm = '', $genre = '', $year = '') {
+    $where = [];
+    $params = [];
+    $types = '';
+    
+    if (!empty($genre)) {
+        $where[] = "genre = ?";
+        $params[] = $genre;
+        $types .= 's';
+    }
+    
+    if (!empty($year)) {
+        $where[] = "year = ?";
+        $params[] = $year;
+        $types .= 'i';
+    }
+    
+    if (!empty($searchTerm)) {
+        $where[] = "(title LIKE ? OR author LIKE ?)";
+        $params[] = '%' . $searchTerm . '%';
+        $params[] = '%' . $searchTerm . '%';
+        $types .= 'ss';
+    }
+    
+    $sql = "SELECT * FROM scifi_books";
+    if ($where) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+    $sql .= " ORDER BY added_on DESC";
+    
+    $stmt = $mysqli->prepare($sql);
+    if ($params) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
 ?>
