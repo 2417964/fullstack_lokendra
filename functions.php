@@ -62,4 +62,16 @@ function searchBooks($mysqli, $searchTerm = '', $genre = '', $year = '') {
     return $stmt->get_result();
 }
 
+function autocompleteSearch($mysqli, $term) {
+    $term = '%' . $term . '%';
+    $stmt = $mysqli->prepare("SELECT title FROM scifi_books WHERE title LIKE ? LIMIT 10");
+    $stmt->bind_param("s", $term);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $titles = [];
+    while ($row = $res->fetch_assoc()) {
+        $titles[] = $row['title'];
+    }
+    return $titles;
+}
 ?>
